@@ -1,0 +1,6 @@
+[phases.build]
+cmds = []
+
+[start]
+cmd = "node server.js"
+```
