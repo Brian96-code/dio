@@ -1,8 +1,0 @@
-{
-  "name": "webcraft-ai",
-  "version": "3.0.0",
-  "description": "WebCraft AI — Try Before You Buy Website Builder",
-  "main": "server.js",
-  "scripts": { "start": "node server.js" },
-  "engines": { "node": ">=18.0.0" }
-}
