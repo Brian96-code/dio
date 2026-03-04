@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebCraft AI — Buat Website Gratis</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0a0f; --sur:#111118; --sur2:#16161f; --bdr:#1e1e2e;
+  --acc:#7c6aff; --acc2:#ff6a9b; --acc3:#00e5c0; --gold:#f5a623;
+  --txt:#e8e8f0; --mut:#7a7a9a; --r:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+
+/* ── UNLOCK MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(5,5,10,.96);backdrop-filter:blur(20px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.overlay.hidden{display:none}
+.unlock-card{background:var(--sur);border:1px solid var(--bdr);border-radius:24px;padding:36px 32px;max-width:500px;width:100%;animation:popIn .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{opacity:0;transform:scale(.9) translateY(24px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+.unlock-header{text-align:center;margin-bottom:28px}
+.unlock-icon{font-size:48px;margin-bottom:12px}
+.unlock-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:8px}
+.unlock-sub{font-size:13.5px;color:var(--mut);line-height:1.65}
+.unlock-sub strong{color:var(--txt)}
+
+/* Preview blurred teaser */
+.preview-teaser{border-radius:12px;overflow:hidden;border:1px solid var(--bdr);margin-bottom:24px;position:relative}
+.preview-teaser iframe{width:100%;height:200px;border:none;filter:blur(3px);pointer-events:none;transform:scale(1.02)}
+.preview-teaser-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 20%,rgba(10,10,15,.95));display:flex;align-items:flex-end;justify-content:center;padding-bottom:16px}
+.preview-teaser-label{font-size:12px;color:var(--mut);display:flex;align-items:center;gap:6px}
+
+/* Pricing */
+.pricing-title{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--mut);font-weight:700;margin-bottom:12px;text-align:center}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.plan{padding:14px 12px;border:1px solid var(--bdr);border-radius:14px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.plan:hover{border-color:var(--acc);background:rgba(124,106,255,.05)}
+.plan.selected{border-color:var(--acc);background:rgba(124,106,255,.08);box-shadow:0 0 0 1px var(--acc)}
+.plan.popular::before{content:'TERBAIK';position:absolute;top:-10px;left:50%;transform:translateX(-50%);padding:2px 10px;background:linear-gradient(135deg,var(--acc),var(--acc2));border-radius:20px;font-size:9px;font-weight:800;letter-spacing:1px;color:white;white-space:nowrap}
+.plan-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--mut);margin-bottom:6px}
+.plan-price{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--txt);margin-bottom:4px}
+.plan-desc{font-size:11px;color:var(--mut);line-height:1.5}
+.plan.selected .plan-name{color:var(--acc)}
+.plan.selected .plan-price{color:var(--acc)}
+
+/* Payment info */
+.payment-info{background:var(--sur2);border:1px solid var(--bdr);border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:13px}
+.payment-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0}
+.payment-row:not(:last-child){border-bottom:1px solid var(--bdr)}
+.payment-label{color:var(--mut);font-size:12px}
+.payment-val{font-weight:600;color:var(--txt)}
+.payment-wa{color:var(--acc3);font-weight:700}
+
+/* Session ID display */
+.sid-box{background:rgba(124,106,255,.06);border:1px solid rgba(124,106,255,.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.sid-label{font-size:11px;color:var(--mut)}
+.sid-val{font-family:monospace;font-size:12px;color:var(--acc);letter-spacing:0.5px}
+.sid-copy{background:none;border:none;color:var(--mut);cursor:pointer;font-size:14px;padding:2px;transition:color .2s}
+.sid-copy:hover{color:var(--acc)}
+
+/* CTA */
+.unlock-cta{width:100%;padding:15px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--acc),var(--acc2));color:white;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;margin-bottom:10px}
+.unlock-cta:hover{opacity:.88;transform:translateY(-1px)}
+.unlock-skip{width:100%;padding:10px;border:1px solid var(--bdr);border-radius:10px;background:transparent;color:var(--mut);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.unlock-skip:hover{border-color:var(--mut);color:var(--txt)}
+
+/* Already paid */
+.already-paid{display:flex;align-items:center;gap:8px;margin-top:12px;justify-content:center;font-size:12px;color:var(--mut)}
+.already-paid input{accent-color:var(--acc);cursor:pointer}
+.already-paid label{cursor:pointer}
+
+/* ── TRIAL EXHAUSTED MODAL ── */
+.trial-card{background:var(--sur);border:1px solid var(--bdr);border-radius:24px;padding:36px 32px;max-width:440px;width:100%;animation:popIn .4s cubic-bezier(.34,1.56,.64,1);text-align:center}
+.trial-icon{font-size:56px;margin-bottom:16px}
+.trial-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px}
+.trial-sub{font-size:13.5px;color:var(--mut);line-height:1.65;margin-bottom:24px}
+.trial-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;background:rgba(0,229,192,.1);border:1px solid rgba(0,229,192,.3);color:var(--acc3);font-size:12px;font-weight:600;margin-bottom:20px}
+
+/* ── HEADER ── */
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;border-bottom:1px solid var(--bdr);background:rgba(10,10,15,.9);backdrop-filter:blur(20px);flex-shrink:0;z-index:100}
+.logo{display:flex;align-items:center;gap:9px;font-family:'Syne',sans-serif;font-weight:800;font-size:17px}
+.logo-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--acc),var(--acc2));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.logo span{color:var(--acc)}
+
+/* Trial indicator */
+.trial-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:8px;border:1px solid var(--bdr);font-size:12px;cursor:pointer;transition:all .2s;background:var(--sur2)}
+.trial-pill.trial{border-color:rgba(245,166,35,.3);color:var(--gold)}
+.trial-pill.unlocked{border-color:rgba(0,229,192,.3);color:var(--acc3)}
+.t-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+.hdr-right{display:flex;align-items:center;gap:8px}
+.btn-hdr{padding:6px 14px;border-radius:8px;border:1px solid var(--bdr);background:transparent;color:var(--mut);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .2s}
+.btn-hdr:hover{border-color:var(--acc);color:var(--acc)}
+.btn-hdr:disabled{opacity:.3;cursor:not-allowed}
+.btn-hdr-pri{padding:6px 14px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--acc),var(--acc2));color:white;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-hdr-pri:hover{opacity:.85}
+.btn-hdr-pri:disabled{opacity:.3;cursor:not-allowed}
+
+/* Lock icons on buttons */
+.btn-hdr.locked::after{content:' 🔒';font-size:10px}
+
+/* ── MAIN ── */
+.main{display:flex;flex:1;overflow:hidden}
+
+/* ── CHAT ── */
+.chat-panel{width:420px;min-width:380px;display:flex;flex-direction:column;border-right:1px solid var(--bdr);background:var(--sur);flex-shrink:0}
+.phase-bar{padding:9px 14px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:5px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.phase-bar::-webkit-scrollbar{display:none}
+.ph{display:flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10.5px;white-space:nowrap;font-weight:600;color:var(--mut);border:1px solid transparent;transition:all .3s}
+.ph.active{color:var(--acc);border-color:var(--acc);background:rgba(124,106,255,.08)}
+.ph.done{color:var(--acc3);border-color:var(--acc3);background:rgba(0,229,192,.06)}
+.ph-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.ph-sep{color:var(--bdr);font-size:9px}
+
+.messages{flex:1;overflow-y:auto;padding:18px 14px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin;scrollbar-color:var(--bdr) transparent}
+.messages::-webkit-scrollbar{width:3px}
+.messages::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+
+.msg{display:flex;gap:9px;animation:msgIn .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0)}}
+.msg.user{flex-direction:row-reverse}
+.av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:2px}
+.av.ai{background:linear-gradient(135deg,var(--acc),var(--acc2))}
+.av.user{background:var(--sur2);border:1px solid var(--bdr)}
+.bub{max-width:83%;padding:11px 13px;border-radius:var(--r);font-size:13.5px;line-height:1.65;border:1px solid var(--bdr)}
+.msg.ai .bub{background:var(--sur);border-radius:4px var(--r) var(--r) var(--r)}
+.msg.user .bub{background:#1a1a2e;border-color:rgba(124,106,255,.3);border-radius:var(--r) 4px var(--r) var(--r)}
+
+.opts{display:flex;flex-direction:column;gap:5px;margin-top:9px}
+.opt{padding:8px 12px;border:1px solid var(--bdr);border-radius:9px;background:var(--sur2);color:var(--txt);font-family:'DM Sans',sans-serif;font-size:12.5px;text-align:left;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px}
+.opt:hover{border-color:var(--acc);background:rgba(124,106,255,.08);color:var(--acc);transform:translateX(3px)}
+.opt.sel{border-color:var(--acc3);background:rgba(0,229,192,.06);color:var(--acc3)}
+.opt-k{font-size:10px;font-weight:700;padding:2px 5px;border-radius:4px;background:rgba(124,106,255,.15);color:var(--acc)}
+
+.chklist{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.chk{display:flex;align-items:center;gap:7px;padding:6px 9px;border:1px solid var(--bdr);border-radius:7px;cursor:pointer;transition:all .2s;font-size:12.5px}
+.chk:hover{border-color:var(--acc);background:rgba(124,106,255,.05)}
+.chk input{accent-color:var(--acc);cursor:pointer}
+.chk-go{margin-top:7px;padding:9px;width:100%;border:none;border-radius:9px;background:linear-gradient(135deg,var(--acc),var(--acc2));color:white;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer}
+.chk-go:hover{opacity:.85}
+
+.typing{display:flex;gap:4px;padding:12px;align-items:center}
+.td{width:6px;height:6px;border-radius:50%;background:var(--acc);animation:tb 1.4s infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes tb{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-6px);opacity:1}}
+
+.input-area{padding:11px 13px;border-top:1px solid var(--bdr);display:flex;gap:7px;align-items:flex-end;flex-shrink:0;background:var(--sur)}
+.input-wrap{flex:1}
+textarea{width:100%;padding:10px 13px;background:var(--sur2);border:1px solid var(--bdr);border-radius:11px;color:var(--txt);font-family:'DM Sans',sans-serif;font-size:13.5px;resize:none;outline:none;line-height:1.5;max-height:100px;min-height:42px;transition:border-color .2s;scrollbar-width:none}
+textarea:focus{border-color:var(--acc)}
+textarea::placeholder{color:var(--mut)}
+.send{width:40px;height:40px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--acc),var(--acc2));color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.send:hover{opacity:.85;transform:scale(1.05)}
+.send:disabled{opacity:.3;cursor:not-allowed;transform:none}
+.send svg{width:15px;height:15px}
+
+/* ── PREVIEW ── */
+.preview-panel{flex:1;display:flex;flex-direction:column;background:var(--bg);min-width:0;position:relative}
+.prev-toolbar{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--bdr);flex-shrink:0;gap:10px}
+.prev-label{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);display:flex;align-items:center;gap:7px}
+.live-badge{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;background:rgba(0,229,192,.1);border:1px solid rgba(0,229,192,.3);color:var(--acc3);font-size:10px;font-weight:600}
+.ld{width:5px;height:5px;border-radius:50%;background:var(--acc3);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.devs{display:flex;gap:3px}
+.dev{padding:4px 9px;border-radius:6px;border:1px solid var(--bdr);background:transparent;color:var(--mut);font-size:11px;cursor:pointer;transition:all .2s}
+.dev.active,.dev:hover{border-color:var(--acc);color:var(--acc);background:rgba(124,106,255,.08)}
+
+.frame-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:18px;overflow:auto;position:relative}
+.fc{transition:all .4s;border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 0 1px var(--bdr)}
+.fc.desktop{width:100%;max-width:100%;height:calc(100vh - 195px)}
+.fc.tablet{width:768px;height:calc(100vh - 195px)}
+.fc.mobile{width:390px;height:700px}
+.bbar{display:flex;align-items:center;gap:7px;padding:9px 13px;background:#1a1a24;border-bottom:1px solid var(--bdr)}
+.bdots{display:flex;gap:5px}
+.bd{width:10px;height:10px;border-radius:50%}
+.bd.r{background:#ff5f57}.bd.y{background:#ffbd2e}.bd.g{background:#28c840}
+.baddr{flex:1;background:var(--sur);border:1px solid var(--bdr);border-radius:5px;padding:3px 9px;font-size:11px;color:var(--mut)}
+iframe#preview{width:100%;border:none;background:white}
+.fc.desktop iframe,.fc.tablet iframe{height:calc(100vh - 240px)}
+.fc.mobile iframe{height:650px}
+
+/* LOCKED OVERLAY on preview */
+.lock-overlay{position:absolute;bottom:0;left:0;right:0;height:220px;background:linear-gradient(to top,rgba(10,10,15,.98) 60%,transparent);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:24px;gap:10px;z-index:5;pointer-events:none}
+.lock-overlay.hidden{display:none}
+.lock-overlay-inner{pointer-events:all;display:flex;flex-direction:column;align-items:center;gap:10px}
+.lock-msg{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--txt);text-align:center}
+.lock-sub{font-size:12.5px;color:var(--mut);text-align:center}
+.lock-btn{padding:12px 28px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--acc),var(--acc2));color:white;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(124,106,255,.4)}
+.lock-btn:hover{opacity:.88;transform:translateY(-2px)}
+
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;text-align:center;padding:40px}
+.ei{width:72px;height:72px;border-radius:18px;background:linear-gradient(135deg,rgba(124,106,255,.12),rgba(255,106,155,.08));border:1px solid rgba(124,106,255,.2);display:flex;align-items:center;justify-content:center;font-size:32px;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.et{font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
+.es{font-size:13px;color:var(--mut);max-width:240px;line-height:1.6}
+
+/* Free badge */
+.free-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:rgba(0,229,192,.08);border:1px solid rgba(0,229,192,.25);color:var(--acc3);font-size:11px;font-weight:700;letter-spacing:0.5px}
+
+.gen-overlay{position:absolute;inset:0;background:rgba(10,10,15,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:10;backdrop-filter:blur(4px);border-radius:12px}
+.gen-spin{width:46px;height:46px;border:3px solid rgba(124,106,255,.15);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gen-txt{font-family:'Syne',sans-serif;font-size:14px;font-weight:600}
+.gen-sub{font-size:12px;color:var(--mut)}
+.gen-bar{width:180px;height:3px;background:var(--bdr);border-radius:2px;overflow:hidden}
+.gen-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));animation:ga 2.5s ease-in-out infinite}
+@keyframes ga{0%{width:0%}70%{width:85%}100%{width:95%}}
+
+.code-panel{position:absolute;bottom:0;right:0;width:100%;height:260px;background:#0d0d14;border-top:1px solid var(--bdr);display:none;flex-direction:column;z-index:20}
+.code-panel.vis{display:flex}
+.code-tbar{display:flex;align-items:center;justify-content:space-between;padding:7px 13px;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.code-ttl{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mut)}
+.code-area{flex:1;overflow:auto;padding:12px;font-family:'Courier New',monospace;font-size:11px;line-height:1.6;color:#a8b4c8;white-space:pre;scrollbar-width:thin;scrollbar-color:var(--bdr) transparent}
+
+.toast{position:fixed;bottom:22px;right:22px;padding:11px 16px;background:var(--sur2);border:1px solid var(--acc3);border-radius:9px;font-size:13px;color:var(--acc3);z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.toast.show{transform:translateY(0);opacity:1}
+
+.msg-text strong{color:var(--txt);font-weight:600}
+.msg-text em{color:var(--acc2);font-style:normal;font-weight:500}
+.msg-text code{background:rgba(124,106,255,.1);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:12px;color:var(--acc)}
+
+@media(max-width:768px){.chat-panel{width:100%;min-width:100%}.preview-panel{display:none}}
+</style>
+</head>
+<body>
+
+<!-- ══ UNLOCK MODAL ══ -->
+<div class="overlay hidden" id="unlockModal">
+  <div class="unlock-card">
+    <div class="unlock-header">
+      <div class="unlock-icon">🎉</div>
+      <div class="unlock-title">Website-mu Sudah Jadi!</div>
+      <div class="unlock-sub">Preview sudah bisa kamu lihat. Untuk <strong>download, deploy, atau edit ulang</strong> — unlock sekarang sekali bayar.</div>
+    </div>
+
+    <!-- Blurred preview teaser -->
+    <div class="preview-teaser">
+      <iframe id="teaserFrame" title="teaser"></iframe>
+      <div class="preview-teaser-overlay">
+        <div class="preview-teaser-label">🔒 Unlock untuk akses penuh</div>
+      </div>
+    </div>
+
+    <div class="pricing-title">Pilih Paket — Bayar Sekali, Milik Selamanya</div>
+    <div class="plans">
+      <div class="plan selected" onclick="selectPlan(this,'starter')">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">Rp 49rb</div>
+        <div class="plan-desc">Download + deploy 1 website ini</div>
+      </div>
+      <div class="plan popular" onclick="selectPlan(this,'pro')">
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">Rp 99rb</div>
+        <div class="plan-desc">Unlimited website 30 hari</div>
+      </div>
+      <div class="plan" onclick="selectPlan(this,'agency')">
+        <div class="plan-name">Agency</div>
+        <div class="plan-price">Rp 299rb</div>
+        <div class="plan-desc">Unlimited + 5 klien</div>
+      </div>
+    </div>
+
+    <!-- Session ID untuk admin unlock -->
+    <div class="sid-box">
+      <div>
+        <div class="sid-label">Session ID kamu (kasih ke admin)</div>
+        <div class="sid-val" id="sidDisplay">—</div>
+      </div>
+      <button class="sid-copy" onclick="copySid()" title="Copy">📋</button>
+    </div>
+
+    <div class="payment-info">
+      <div class="payment-row">
+        <span class="payment-label">Transfer ke</span>
+        <!-- EDIT: ganti nomor rekening kamu -->
+        <span class="payment-val">BCA 1234567890 a/n WebCraft AI</span>
+      </div>
+      <div class="payment-row">
+        <span class="payment-label">Atau WA admin</span>
+        <!-- EDIT: ganti nomor WA kamu -->
+        <span class="payment-wa">0812-XXXX-XXXX</span>
+      </div>
+      <div class="payment-row">
+        <span class="payment-label">Konfirmasi</span>
+        <span class="payment-val">Kirim bukti + Session ID</span>
+      </div>
+    </div>
+
+    <button class="unlock-cta" onclick="openWA()">📱 Hubungi Admin via WhatsApp</button>
+    <button class="unlock-skip" onclick="closeUnlock()">Lanjut lihat preview dulu</button>
+
+    <div class="already-paid">
+      <input type="checkbox" id="paidCheck">
+      <label for="paidCheck">Sudah transfer? Centang & tunggu konfirmasi admin</label>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TRIAL EXHAUSTED MODAL ══ -->
+<div class="overlay hidden" id="trialModal">
+  <div class="trial-card">
+    <div class="trial-icon">✦</div>
+    <div class="trial-badge">1 website trial sudah digunakan</div>
+    <div class="trial-title">Suka hasilnya?</div>
+    <div class="trial-sub">
+      Kamu sudah mencoba WebCraft AI dan melihat hasilnya langsung.<br><br>
+      Untuk generate website baru, edit ulang, download, atau deploy — unlock sekarang.
+    </div>
+    <div class="plans" style="margin-bottom:20px">
+      <div class="plan selected" onclick="selectPlan(this,'starter')">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">Rp 49rb</div>
+        <div class="plan-desc">1 website download</div>
+      </div>
+      <div class="plan popular" onclick="selectPlan(this,'pro')">
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">Rp 99rb</div>
+        <div class="plan-desc">Unlimited 30 hari</div>
+      </div>
+      <div class="plan" onclick="selectPlan(this,'agency')">
+        <div class="plan-name">Agency</div>
+        <div class="plan-price">Rp 299rb</div>
+        <div class="plan-desc">Unlimited + klien</div>
+      </div>
+    </div>
+    <div class="sid-box" style="margin-bottom:14px">
+      <div>
+        <div class="sid-label">Session ID (kasih ke admin setelah bayar)</div>
+        <div class="sid-val" id="sidDisplay2">—</div>
+      </div>
+      <button class="sid-copy" onclick="copySid()" title="Copy">📋</button>
+    </div>
+    <button class="unlock-cta" onclick="openWA()">📱 Hubungi Admin — Unlock Sekarang</button>
+    <button class="unlock-skip" onclick="closeTrialModal()">Tutup</button>
+  </div>
+</div>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">✦</div>
+    WebCraft <span>AI</span>
+  </div>
+  <div class="hdr-right">
+    <div class="trial-pill trial" id="planPill" onclick="showUnlock()">
+      <div class="t-dot"></div>
+      <span id="planLabel">Trial — 1 generate gratis</span>
+    </div>
+    <div class="free-badge">🆓 Preview Gratis</div>
+    <button class="btn-hdr locked" id="downloadBtn" onclick="handleDownload()">↓ Unduh</button>
+    <button class="btn-hdr-pri locked" id="deployBtn" onclick="handleDeploy()">🚀 Deploy</button>
+    <button class="btn-hdr" onclick="toggleCode()">⌨ Kode</button>
+  </div>
+</header>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+  <!-- CHAT -->
+  <div class="chat-panel">
+    <div class="phase-bar">
+      <div class="ph active" id="ph0"><div class="ph-dot"></div>Mulai</div>
+      <span class="ph-sep">›</span>
+      <div class="ph" id="ph1"><div class="ph-dot"></div>Profil</div>
+      <span class="ph-sep">›</span>
+      <div class="ph" id="ph2"><div class="ph-dot"></div>Konten</div>
+      <span class="ph-sep">›</span>
+      <div class="ph" id="ph3"><div class="ph-dot"></div>Desain</div>
+      <span class="ph-sep">›</span>
+      <div class="ph" id="ph4"><div class="ph-dot"></div>Teknis</div>
+      <span class="ph-sep">›</span>
+      <div class="ph" id="ph5"><div class="ph-dot"></div>Generate</div>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+      <div class="input-wrap">
+        <textarea id="inp" placeholder="Ketik pesanmu..." rows="1"
+          onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      </div>
+      <button class="send" id="sendBtn" onclick="sendMsg()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="preview-panel">
+    <div class="prev-toolbar">
+      <div class="prev-label">
+        Preview
+        <div class="live-badge hidden" id="liveBadge"><div class="ld"></div>LIVE</div>
+      </div>
+      <div class="devs">
+        <button class="dev active" onclick="setDev('desktop',this)">🖥 Desktop</button>
+        <button class="dev" onclick="setDev('tablet',this)">📱 Tablet</button>
+        <button class="dev" onclick="setDev('mobile',this)">📲 Mobile</button>
+      </div>
+      <button class="btn-hdr" onclick="openFullscreen()">⛶ Fullscreen</button>
+    </div>
+
+    <div class="frame-wrap">
+      <!-- Empty -->
+      <div class="empty-state" id="emptyState">
+        <div class="ei">🌐</div>
+        <div class="et">Preview Websitemu</div>
+        <div class="es">Chat dengan AI di kiri → website langsung muncul di sini — <strong>gratis!</strong></div>
+      </div>
+
+      <!-- Frame -->
+      <div class="fc desktop hidden" id="fc">
+        <div class="bbar">
+          <div class="bdots"><div class="bd r"></div><div class="bd y"></div><div class="bd g"></div></div>
+          <div class="baddr" id="addrBar">preview — website.html</div>
+        </div>
+        <iframe id="preview" title="preview"></iframe>
+
+        <!-- Lock overlay -->
+        <div class="lock-overlay hidden" id="lockOverlay">
+          <div class="lock-overlay-inner">
+            <div class="lock-msg">🔒 Download & Deploy dikunci</div>
+            <div class="lock-sub">Preview gratis — Unlock untuk download atau deploy</div>
+            <button class="lock-btn" onclick="showUnlock()">⚡ Unlock Sekarang — mulai Rp 49rb</button>
+          </div>
+        </div>
+
+        <!-- Generating -->
+        <div class="gen-overlay hidden" id="genOverlay">
+          <div class="gen-spin"></div>
+          <div class="gen-txt">Membuat website...</div>
+          <div class="gen-sub" id="genSub">Menganalisis kebutuhan</div>
+          <div class="gen-bar"><div class="gen-fill"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Code panel -->
+    <div class="code-panel" id="codePanel">
+      <div class="code-tbar">
+        <div class="code-ttl">◉ HTML Source</div>
+        <div style="display:flex;gap:5px">
+          <button class="btn-hdr" onclick="copyCode()" style="font-size:11px;padding:3px 9px">📋 Copy</button>
+          <button class="btn-hdr" onclick="toggleCode()" style="font-size:11px;padding:3px 9px">✕</button>
+        </div>
+      </div>
+      <div class="code-area" id="codeArea">// Kode muncul setelah website di-generate...</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────
+const S = {
+  sid: localStorage.getItem('wc_sid') || crypto.randomUUID(),
+  plan: 'trial',
+  generates: 0,
+  canDownload: false,
+  trialLimit: 1,
+  html: null,
+  history: [],
+  busy: false,
+  selectedPlan: 'starter',
+};
+localStorage.setItem('wc_sid', S.sid);
+
+const SYSTEM = `Kamu adalah WebCraft AI — konsultan website AI yang ramah, sabar, dan profesional.
+
+KEPRIBADIAN: Hangat, tidak menggurui, satu pertanyaan per pesan, selalu berikan pilihan A/B/C/D, validasi setiap jawaban.
+
+ALUR:
+FASE 0: Tanya untuk siapa website ini
+FASE 1: Profil & tujuan
+FASE 2: Halaman & fitur (gunakan ☐ checklist)
+FASE 3: Tampilan & warna
+FASE 4: Domain & budget  
+FASE 5: Ringkasan → konfirmasi
+
+GENERATE (setelah konfirmasi Fase 5) — format PERSIS ini:
+===WEBSITE_START===
+<!DOCTYPE html>
+...kode HTML lengkap 400+ baris...
+</html>
+===WEBSITE_END===
+
+ATURAN KODE: CSS internal, responsif, Google Fonts, konten realistis sesuai bisnis, animasi CSS, komentar <!-- EDIT: -->, emoji/gradient (bukan gambar external), JANGAN potong kode.`;
+
+// ── INIT SESSION ───────────────────────────────────
+async function initSession() {
+  try {
+    const r = await fetch('/api/session?sid='+encodeURIComponent(S.sid));
+    const d = await r.json();
+    S.plan        = d.plan;
+    S.generates   = d.generates;
+    S.canDownload = d.canDownload;
+    S.trialLimit  = d.trialLimit;
+    updatePlanUI();
+  } catch(e) { console.warn('Session init failed:', e.message); }
+}
+
+function updatePlanUI() {
+  const pill  = document.getElementById('planPill');
+  const label = document.getElementById('planLabel');
+  const dlBtn = document.getElementById('downloadBtn');
+  const dpBtn = document.getElementById('deployBtn');
+
+  if (S.plan === 'trial') {
+    const left = Math.max(0, S.trialLimit - S.generates);
+    pill.className='trial-pill trial';
+    label.textContent = left > 0 ? `Trial — ${left} generate gratis` : 'Trial habis — Unlock!';
+    dlBtn.classList.add('locked');
+    dpBtn.classList.add('locked');
+  } else {
+    pill.className='trial-pill unlocked';
+    label.textContent = '✦ '+S.plan.toUpperCase()+' — Unlocked';
+    dlBtn.classList.remove('locked');
+    dpBtn.classList.remove('locked');
+  }
+}
+
+// ── API CALL ───────────────────────────────────────
+async function callAI(msg) {
+  S.history.push({ role:'user', content:msg });
+  const r = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'X-Session-ID': S.sid },
+    body: JSON.stringify({ system:SYSTEM, messages:S.history })
+  });
+  const d = await r.json();
+
+  if (d.error) {
+    if (d.error.type === 'trial_limit') {
+      showTrialModal();
+      throw new Error('trial_limit');
+    }
+    throw new Error(d.error.message);
+  }
+
+  const text = (d.content||[]).map(c=>c.text||'').join('');
+  S.history.push({ role:'assistant', content:text });
+
+  // Update meta
+  if (d._meta) {
+    S.plan        = d._meta.plan;
+    S.generates   = d._meta.generates;
+    S.canDownload = d._meta.canDownload;
+    updatePlanUI();
+  }
+  return text;
+}
+
+// ── CHAT RENDER ────────────────────────────────────
+function addMsg(role, content, extras=null) {
+  const msgs = document.getElementById('messages');
+  const wrap = document.createElement('div'); wrap.className='msg '+role;
+  const av = document.createElement('div'); av.className='av '+role; av.textContent=role==='ai'?'✦':'👤';
+  const bub = document.createElement('div'); bub.className='bub';
+  const txt = document.createElement('div'); txt.className='msg-text';
+  txt.innerHTML=fmt(content);
+  bub.appendChild(txt);
+  if (extras) bub.appendChild(extras);
+  wrap.appendChild(av); wrap.appendChild(bub);
+  msgs.appendChild(wrap); msgs.scrollTop=msgs.scrollHeight;
+  return wrap;
+}
+function fmt(t){return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/`(.*?)`/g,'<code>$1</code>').replace(/\n/g,'<br>')}
+
+function showTyping(){const m=document.getElementById('messages');const d=document.createElement('div');d.className='msg ai';d.id='tEl';d.innerHTML='<div class="av ai">✦</div><div class="bub"><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>';m.appendChild(d);m.scrollTop=m.scrollHeight;}
+function hideTyping(){document.getElementById('tEl')?.remove();}
+
+function mkOpts(opts){const d=document.createElement('div');d.className='opts';opts.forEach((o,i)=>{const b=document.createElement('button');b.className='opt';b.innerHTML=`<span class="opt-k">${['A','B','C','D','E'][i]}</span>${o}`;b.onclick=()=>{document.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');setTimeout(()=>sendUserMsg(o),120);};d.appendChild(b);});return d;}
+function mkChk(items){const d=document.createElement('div');d.className='chklist';items.forEach((it,i)=>{const r=document.createElement('label');r.className='chk';r.innerHTML=`<input type="checkbox" id="ck${i}"><span>${it}</span>`;d.appendChild(r);});const btn=document.createElement('button');btn.className='chk-go';btn.textContent='Lanjutkan →';btn.onclick=()=>{const sel=items.filter((_,i)=>document.getElementById('ck'+i)?.checked);if(!sel.length){toast('⚠ Pilih minimal satu','#ff6a9b');return;}sendUserMsg(sel.join(', '));};d.appendChild(btn);return d;}
+
+function parseResp(text) {
+  const S1='===WEBSITE_START===', E1='===WEBSITE_END===';
+  const si=text.indexOf(S1), ei=text.indexOf(E1);
+  if (si!==-1 && ei!==-1) {
+    const html=text.substring(si+S1.length,ei).trim();
+    if (!html.includes('<!DOCTYPE')&&!html.includes('<html')){addMsg('ai','⚠️ Kode tidak lengkap. Ketik **"generate ulang"**.');return;}
+    const before=text.substring(0,si).trim();
+    if (before) addMsg('ai',before);
+    S.html=html;
+    renderPreview(html);
+    setPhase(5);
+    // Setelah generate berhasil di trial → tunjukkan unlock modal
+    if (S.plan==='trial') {
+      setTimeout(()=>showUnlock(),800);
+    } else {
+      unlockButtons();
+    }
+    addMsg('ai','🎉 **Website-mu sudah jadi!**'+(S.plan==='trial'?' Preview gratis tersedia. Unlock untuk download & deploy!':' Download atau deploy kapan saja!'));
+    return;
+  }
+  if (si!==-1&&ei===-1){addMsg('ai','⚠️ Respons terpotong. Ketik **"generate ulang"**.');return;}
+
+  detectPhase(text);
+  const lines=text.split('\n'),opts=[],chks=[],rest=[];
+  lines.forEach(l=>{const t=l.trim();if(/^[A-E]\)/.test(t))opts.push(t.replace(/^[A-E]\)\s*/,''));else if(t.startsWith('☐'))chks.push(t.replace('☐','').trim());else rest.push(l);});
+  const main=rest.join('\n').trim();
+  if(opts.length){const m=addMsg('ai',main||text.split('\n')[0]);m.querySelector('.bub').appendChild(mkOpts(opts));}
+  else if(chks.length){const m=addMsg('ai',main||text.split('\n')[0]);m.querySelector('.bub').appendChild(mkChk(chks));}
+  else addMsg('ai',text);
+}
+
+function detectPhase(t){const l=t.toLowerCase();if(l.includes('untuk siapa')||l.includes('selamat datang'))setPhase(0);else if(l.includes('profesi')||l.includes('nama usaha'))setPhase(1);else if(l.includes('halaman')||l.includes('fitur'))setPhase(2);else if(l.includes('tampilan')||l.includes('warna'))setPhase(3);else if(l.includes('domain')||l.includes('budget'))setPhase(4);else if(l.includes('ringkasan')||l.includes('konfirmasi'))setPhase(4);}
+function setPhase(n){for(let i=0;i<=5;i++){const el=document.getElementById('ph'+i);if(!el)continue;el.className='ph';if(i<n)el.classList.add('done');else if(i===n)el.classList.add('active');}}
+
+// ── SEND ───────────────────────────────────────────
+async function sendMsg(){const el=document.getElementById('inp');const t=el.value.trim();if(!t||S.busy)return;sendUserMsg(t);el.value='';el.style.height='auto';}
+async function sendUserMsg(text){
+  if(S.busy)return; S.busy=true;
+  addMsg('user',text);
+  document.getElementById('sendBtn').disabled=true;
+  const isRegen=/generate ulang|lanjutkan|coba lagi/i.test(text);
+  if(isRegen){S.history.push({role:'user',content:'[REMINDER] Generate HTML LENGKAP sekarang. ===WEBSITE_START=== dan ===WEBSITE_END=== WAJIB ada. Min 400 baris.'});S.history.push({role:'assistant',content:'Siap, generate ulang sekarang!'});}
+  showTyping();
+  if(/generate|buatkan|buat website/i.test(text)||isRegen)showGen();
+  try{
+    const resp=await callAI(isRegen?'Generate website LENGKAP dengan marker ===WEBSITE_START=== dan ===WEBSITE_END===. Jangan potong.':text);
+    hideTyping();
+    if(resp.includes('===WEBSITE_START==='))await new Promise(r=>setTimeout(r,600));
+    parseResp(resp);
+  }catch(e){
+    hideTyping();
+    if(e.message!=='trial_limit')addMsg('ai','❌ '+e.message+'\n\nCoba lagi ya!');
+  }finally{
+    hideGen(); S.busy=false;
+    document.getElementById('sendBtn').disabled=false;
+    document.getElementById('inp').focus();
+  }
+}
+
+// ── PREVIEW ───────────────────────────────────────
+function renderPreview(html){
+  document.getElementById('emptyState').classList.add('hidden');
+  const fc=document.getElementById('fc'); fc.classList.remove('hidden');
+  document.getElementById('liveBadge').classList.remove('hidden');
+  const iframe=document.getElementById('preview');
+  const doc=iframe.contentDocument||iframe.contentWindow.document;
+  doc.open();doc.write(html);doc.close();
+  document.getElementById('codeArea').textContent=html;
+  // Show lock overlay for trial users
+  if(S.plan==='trial') document.getElementById('lockOverlay').classList.remove('hidden');
+  const m=html.match(/WEBSITE:\s*([^\n*-]+)/);
+  if(m)document.getElementById('addrBar').textContent='preview — '+m[1].trim().toLowerCase().replace(/\s+/g,'-')+'.html';
+}
+function unlockButtons(){
+  document.getElementById('lockOverlay').classList.add('hidden');
+  document.getElementById('downloadBtn').classList.remove('locked');
+  document.getElementById('deployBtn').classList.remove('locked');
+}
+function showGen(){document.getElementById('emptyState').classList.add('hidden');document.getElementById('fc').classList.remove('hidden');document.getElementById('genOverlay').classList.remove('hidden');const steps=['Menganalisis...','Merancang...','Menulis HTML...','Menerapkan desain...','Animasi...','Finalisasi...'];let i=0;const iv=setInterval(()=>{if(i<steps.length)document.getElementById('genSub').textContent=steps[i++];else clearInterval(iv);},500);}
+function hideGen(){document.getElementById('genOverlay').classList.add('hidden');}
+function setDev(d,btn){document.querySelectorAll('.dev').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('fc').className='fc '+d;}
+function openFullscreen(){if(!S.html){toast('⚠ Generate dulu!','#ff6a9b');return;}const w=window.open('','_blank');w.document.write(S.html);w.document.close();}
+
+// ── UNLOCK FLOW ───────────────────────────────────
+function selectPlan(el,plan){document.querySelectorAll('.plan').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');S.selectedPlan=plan;}
+function showUnlock(){
+  // Isi teaser iframe
+  if(S.html){const t=document.getElementById('teaserFrame');const d=t.contentDocument||t.contentWindow.document;d.open();d.write(S.html);d.close();}
+  document.getElementById('sidDisplay').textContent=S.sid;
+  document.getElementById('unlockModal').classList.remove('hidden');
+}
+function closeUnlock(){document.getElementById('unlockModal').classList.add('hidden');}
+function showTrialModal(){document.getElementById('sidDisplay2').textContent=S.sid;document.getElementById('trialModal').classList.remove('hidden');}
+function closeTrialModal(){document.getElementById('trialModal').classList.add('hidden');}
+function copySid(){navigator.clipboard.writeText(S.sid).then(()=>toast('📋 Session ID di-copy!'));}
+function openWA(){
+  const prices={starter:'49.000',pro:'99.000',agency:'299.000'};
+  const msg=`Halo admin WebCraft AI! Saya mau unlock paket ${S.selectedPlan} (Rp ${prices[S.selectedPlan]||'49.000'}).\n\nSession ID saya: ${S.sid}\n\nSudah transfer, mohon dikonfirmasi. Terima kasih!`;
+  // EDIT: ganti nomor WA admin kamu
+  window.open('https://wa.me/6281200000000?text='+encodeURIComponent(msg),'_blank');
+}
+
+// ── DOWNLOAD & DEPLOY ──────────────────────────────
+function handleDownload(){
+  if(S.plan==='trial'){showUnlock();return;}
+  if(!S.html){toast('⚠ Generate website dulu!','#ff6a9b');return;}
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([S.html],{type:'text/html'}));a.download='website.html';a.click();toast('✅ File berhasil didownload!');
+}
+function handleDeploy(){
+  if(S.plan==='trial'){showUnlock();return;}
+  if(!S.html){toast('⚠ Generate website dulu!','#ff6a9b');return;}
+  handleDownload();
+  setTimeout(()=>{if(confirm('File didownload! Buka Netlify Drop untuk upload online?'))window.open('https://app.netlify.com/drop','_blank');},600);
+}
+
+// ── CODE ──────────────────────────────────────────
+function toggleCode(){document.getElementById('codePanel').classList.toggle('vis');}
+function copyCode(){if(!S.html){toast('⚠ Belum ada kode','#ff6a9b');return;}navigator.clipboard.writeText(S.html).then(()=>toast('📋 Kode di-copy!'));}
+
+// ── TOAST ─────────────────────────────────────────
+function toast(msg,color=null){const t=document.getElementById('toast');t.textContent=msg;t.style.color=color||'var(--acc3)';t.style.borderColor=color||'var(--acc3)';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+// ── INPUT ─────────────────────────────────────────
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
+
+// ── STARTUP ───────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async()=>{
+  await initSession();
+  // Init chat langsung tanpa modal
+  const welcome=`Halo! Selamat datang di **WebCraft AI** ✦\n\n🎁 **Coba gratis — langsung generate 1 website tanpa daftar!**\n\nAku bantu kamu punya website keren dari nol. Santai, aku tuntun step by step 😊\n\n**Untuk siapa website ini dibuat?**`;
+  const opts=['Untuk aku sendiri (portofolio / personal branding)','Untuk usaha/bisnisku (UMKM, toko, jasa)','Untuk perusahaan atau organisasi','Lainnya — aku ceritakan sendiri'];
+  await new Promise(r=>setTimeout(r,300));
+  const m=addMsg('ai',welcome);m.querySelector('.bub').appendChild(mkOpts(opts));
+  S.history.push({role:'assistant',content:welcome+'\n\n'+opts.map((o,i)=>String.fromCharCode(65+i)+') '+o).join('\n')});
+});
+</script>
+</body>
+</html>
